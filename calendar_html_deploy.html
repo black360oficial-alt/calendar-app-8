@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Calendários - Outubro 2024</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { Calendar, Clock, Target, Book, Dumbbell, Heart, CheckCircle2, Star, Zap, Briefcase, PenTool, TrendingUp, ChevronLeft, ChevronRight, Trophy } = lucide;
+
+        const MobileCalendarApp = () => {
+            const [completedTasks, setCompletedTasks] = useState(new Set());
+            const [currentDay, setCurrentDay] = useState(0);
+            const [showStats, setShowStats] = useState(false);
+            
+            // Salvar progresso no localStorage
+            useEffect(() => {
+                const saved = localStorage.getItem('calendar-progress');
+                if (saved) {
+                    setCompletedTasks(new Set(JSON.parse(saved)));
+                }
+            }, []);
+
+            useEffect(() => {
+                localStorage.setItem('calendar-progress', JSON.stringify(Array.from(completedTasks)));
+            }, [completedTasks]);
+
+            const toggleTask = (taskId) => {
+                const newCompleted = new Set(completedTasks);
+                if (newCompleted.has(taskId)) {
+                    newCompleted.delete(taskId);
+                } else {
+                    newCompleted.add(taskId);
+                }
+                setCompletedTasks(newCompleted);
+            };
+
+            const calendars = [
+                { name: "1. Vox2You", emoji: "🎯", status: "segunda" },
+                { name: "2. Luiz Neto", emoji: "📚", status: "segunda" },
+                { name: "3. Gordos Pizzaria", emoji: "🍕", status: "terça" },
+                { name: "4. Acia", emoji: "🏢", status: "terça" },
+                { name: "5. Acia Conecta", emoji: "🌐", status: "quarta" },
+                { name: "6. R&R Conect", emoji: "💼", status: "quarta" },
+                { name: "7. Frederico Ozanam", emoji: "❤️", status: "quinta" },
+                { name: "8. Eva Volei", emoji: "🏐", status: "quinta" }
+            ];
+
+            const TaskItem = ({ id, task, time, priority, icon: Icon, output, isCompleted }) => {
+                const priorityColors = {
+                    'importante': 'border-l-4 border-red-500 bg-red-50',
+                    'urgente': 'border-l-4 border-orange-500 bg-orange-50',
+                    'circunstancial': 'border-l-4 border-gray-400 bg-gray-50'
+                };
+
+                return React.createElement('div', {
+                    className: `p-4 rounded-xl mb-3 ${priorityColors[priority]} cursor-pointer transition-all active:scale-95 ${isCompleted ? 'opacity-60' : ''}`,
+                    onClick: () => toggleTask(id)
+                }, 
+                    React.createElement('div', { className: "flex items-center justify-between" },
+                        React.createElement('div', { className: "flex items-center space-x-3 flex-1" },
+                            React.createElement(Icon, { className: "w-6 h-6 text-purple-600 flex-shrink-0" }),
+                            React.createElement('div', { className: "flex-1" },
+                                React.createElement('h4', { 
+                                    className: `font-semibold text-sm ${isCompleted ? 'line-through text-gray-500' : 'text-gray-800'}`
+                                }, task),
+                                React.createElement('p', { className: "text-xs text-gray-600 mt-1" }, time),
+                                output && React.createElement('p', { className: "text-xs text-blue-600 font-medium mt-1" }, `→ ${output}`)
+                            )
+                        ),
+                        React.createElement('div', { 
+                            className: `w-8 h-8 rounded-full flex items-center justify-center ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`
+                        },
+                            React.createElement(CheckCircle2, { 
+                                className: `w-5 h-5 ${isCompleted ? 'text-white' : 'text-gray-400'}`
+                            })
+                        )
+                    )
+                );
+            };
+
+            const days = [
+                {
+                    date: "22/09",
+                    day: "SEG",
+                    theme: "VOX2YOU + LUIZ NETO",
+                    emoji: "🎯",
+                    color: "from-blue-500 to-purple-600",
+                    tasks: [
+                        { id: 'm1-1', task: "Academia + Ritual", time: "6:00-7:30", priority: "importante", icon: Dumbbell, period: "morning" },
+                        { id: 'm1-2', task: "Calendário Vox2You", time: "8:00-9:00", priority: "importante", icon: PenTool, output: "15 posts estratégicos", period: "morning" },
+                        { id: 'm1-3', task: "Calendário Luiz Neto", time: "9:00-10:00", priority: "importante", icon: PenTool, output: "Desenvolvimento pessoal", period: "morning" },
+                        { id: 'm1-4', task: "Leitura", time: "10:00-10:30", priority: "importante", icon: Book, period: "morning" },
+                        { id: 'a1-1', task: "CSO: Gestão time", time: "14:00-15:30", priority: "importante", icon: Briefcase, period: "afternoon" },
+                        { id: 'a1-2', task: "Review calendários", time: "16:00-16:30", priority: "urgente", icon: CheckCircle2, output: "Quality check", period: "afternoon" },
+                        { id: 'e1-1', task: "Tempo com noiva", time: "19:00-21:30", priority: "importante", icon: Heart, period: "evening" }
+                    ]
+                },
+                {
+                    date: "23/09",
+                    day: "TER",
+                    theme: "GORDOS + ACIA",
+                    emoji: "🍕",
+                    color: "from-orange-500 to-red-600",
+                    tasks: [
+                        { id: 'm2-1', task: "Academia + Energia", time: "6:00-7:30", priority: "importante", icon: Dumbbell, period: "morning" },
+                        { id: 'm2-2', task: "Calendário Gordos", time: "8:00-9:00", priority: "importante", icon: PenTool, output: "Movimento + delivery", period: "morning" },
+                        { id: 'm2-3', task: "Calendário Acia", time: "9:00-10:00", priority: "importante", icon: PenTool, output: "Associativismo", period: "morning" },
+                        { id: 'm2-4', task: "Leitura", time: "10:00-10:30", priority: "importante", icon: Book, period: "morning" },
+                        { id: 'a2-1', task: "Reunião clientes", time: "14:00-15:30", priority: "importante", icon: Target, period: "afternoon" },
+                        { id: 'a2-2', task: "Finalizar calendários", time: "16:00-16:30", priority: "urgente", icon: Calendar, output: "2 calendários prontos", period: "afternoon" },
+                        { id: 'e2-1', task: "Tempo com noiva", time: "19:00-21:30", priority: "importante", icon: Heart, period: "evening" }
+                    ]
+                },
+                {
+                    date: "24/09",
+                    day: "QUA",
+                    theme: "CONECTA + R&R",
+                    emoji: "🌐",
+                    color: "from-green-500 to-blue-600",
+                    tasks: [
+                        { id: 'm3-1', task: "Academia + Ritual", time: "6:00-7:30", priority: "importante", icon: Dumbbell, period: "morning" },
+                        { id: 'm3-2', task: "Calendário Acia Conecta", time: "8:00-9:00", priority: "importante", icon: PenTool, output: "Networking digital", period: "morning" },
+                        { id: 'm3-3', task: "Calendário R&R Conect", time: "9:00-10:00", priority: "importante", icon: PenTool, output: "Contabilidade moderna", period: "morning" },
+                        { id: 'm3-4', task: "Leitura", time: "10:00-10:30", priority: "importante", icon: Book, period: "morning" },
+                        { id: 'a3-1', task: "Prep reunião Goiânia", time: "14:00-15:30", priority: "urgente", icon: Target, output: "Apresentação pronta", period: "afternoon" },
+                        { id: 'a3-2', task: "Revisão 6 calendários", time: "16:00-17:00", priority: "importante", icon: CheckCircle2, period: "afternoon" },
+                        { id: 'e3-1', task: "Tempo com noiva", time: "19:00-21:30", priority: "importante", icon: Heart, period: "evening" }
+                    ]
+                },
+                {
+                    date: "25/09",
+                    day: "QUI",
+                    theme: "OZANAM + EVA VOLEI",
+                    emoji: "❤️",
+                    color: "from-pink-500 to-purple-600",
+                    tasks: [
+                        { id: 'm4-1', task: "Academia + Energia", time: "6:00-7:30", priority: "importante", icon: Dumbbell, period: "morning" },
+                        { id: 'm4-2', task: "Calendário F. Ozanam", time: "8:00-9:00", priority: "importante", icon: PenTool, output: "Assistência social", period: "morning" },
+                        { id: 'm4-3', task: "Calendário Eva Volei", time: "9:00-10:00", priority: "importante", icon: PenTool, output: "Esporte + comunidade", period: "morning" },
+                        { id: 'm4-4', task: "Leitura", time: "10:00-10:30", priority: "importante", icon: Book, period: "morning" },
+                        { id: 'a4-1', task: "Design TODOS calendários", time: "14:00-16:00", priority: "urgente", icon: Star, output: "8 PDFs prontos", period: "afternoon" },
+                        { id: 'a4-2', task: "Planejamento outubro", time: "16:30-17:30", priority: "importante", icon: Briefcase, period: "afternoon" },
+                        { id: 'e4-1', task: "Tempo com noiva", time: "19:00-21:30", priority: "importante", icon: Heart, period: "evening" }
+                    ]
+                },
+                {
+                    date: "26/09",
+                    day: "SEX",
+                    theme: "ENTREGA ÉPICA! 🏆",
+                    emoji: "🚀",
+                    color: "from-yellow-500 to-orange-600",
+                    tasks: [
+                        { id: 'm5-1', task: "Academia + Ritual", time: "6:00-7:30", priority: "importante", icon: Dumbbell, period: "morning" },
+                        { id: 'm5-2', task: "ENVIO DOS 8 CALENDÁRIOS", time: "8:00-10:00", priority: "urgente", icon: Target, output: "🏆 MISSÃO CUMPRIDA!", period: "morning" },
+                        { id: 'm5-3', task: "Leitura celebrativa", time: "10:00-10:30", priority: "importante", icon: Book, period: "morning" },
+                        { id: 'a5-1', task: "Análise métricas", time: "14:00-15:30", priority: "importante", icon: TrendingUp, period: "afternoon" },
+                        { id: 'e5-1', task: "CELEBRAÇÃO!", time: "19:00-22:00", priority: "importante", icon: Trophy, period: "evening" }
+                    ]
+                }
+            ];
+
+            const getProgress = () => {
+                const total = days.reduce((acc, day) => acc + day.tasks.length, 0);
+                const completed = completedTasks.size;
+                return { completed, total, percentage: Math.round((completed / total) * 100) };
+            };
+
+            const getCalendarProgress = () => {
+                const calendarTasks = days.reduce((acc, day) => {
+                    const calTasks = day.tasks.filter(task => task.icon === PenTool);
+                    return acc.concat(calTasks);
+                }, []);
+                const completedCalendars = calendarTasks.filter(task => completedTasks.has(task.id)).length;
+                return { completed: completedCalendars, total: 8 };
+            };
+
+            const progress = getProgress();
+            const calendarProgress = getCalendarProgress();
+            const currentDayData = days[currentDay];
+            const morningTasks = currentDayData.tasks.filter(t => t.period === 'morning');
+            const afternoonTasks = currentDayData.tasks.filter(t => t.period === 'afternoon');
+            const eveningTasks = currentDayData.tasks.filter(t => t.period === 'evening');
+
+            if (showStats) {
+                return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4" },
+                    React.createElement('div', { className: "bg-white rounded-2xl p-6 mb-6 shadow-lg" },
+                        React.createElement('div', { className: "flex items-center justify-between mb-4" },
+                            React.createElement('h2', { className: "text-2xl font-bold text-gray-800" }, "📊 Progresso Geral"),
+                            React.createElement('button', { 
+                                onClick: () => setShowStats(false),
+                                className: "bg-purple-500 text-white px-4 py-2 rounded-lg font-medium"
+                            }, "Voltar")
+                        ),
+                        React.createElement('div', { className: "grid grid-cols-2 gap-4 mb-6" },
+                            React.createElement('div', { className: "bg-gradient-to-r from-purple-500 to-blue-500 text-white p-4 rounded-xl text-center" },
+                                React.createElement('div', { className: "text-3xl font-bold" }, `${progress.completed}/${progress.total}`),
+                                React.createElement('div', { className: "text-sm opacity-90" }, "Tarefas Concluídas")
+                            ),
+                            React.createElement('div', { className: "bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-xl text-center" },
+                                React.createElement('div', { className: "text-3xl font-bold" }, `${calendarProgress.completed}/8`),
+                                React.createElement('div', { className: "text-sm opacity-90" }, "Calendários Prontos")
+                            )
+                        ),
+                        React.createElement('div', { className: "mb-6" },
+                            React.createElement('div', { className: "flex justify-between items-center mb-2" },
+                                React.createElement('span', { className: "text-sm font-medium text-gray-700" }, "Progresso Geral"),
+                                React.createElement('span', { className: "text-sm font-bold text-purple-600" }, `${progress.percentage}%`)
+                            ),
+                            React.createElement('div', { className: "w-full bg-gray-200 rounded-full h-3" },
+                                React.createElement('div', { 
+                                    className: "bg-gradient-to-r from-purple-500 to-blue-500 h-3 rounded-full transition-all duration-500",
+                                    style: {width: `${progress.percentage}%`}
+                                })
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: "bg-white rounded-2xl p-6 shadow-lg" },
+                        React.createElement('h3', { className: "text-xl font-bold text-gray-800 mb-4" }, "🎯 Status dos Calendários"),
+                        React.createElement('div', { className: "space-y-3" },
+                            calendars.map((cal, index) => {
+                                const task = days.reduce((found, day) => 
+                                    found || day.tasks.find(t => t.output && t.output.toLowerCase().includes(cal.name.toLowerCase().split(' ')[1])), 
+                                null);
+                                const isCompleted = task && completedTasks.has(task.id);
+                                
+                                return React.createElement('div', { 
+                                    key: index, 
+                                    className: "flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                },
+                                    React.createElement('div', { className: "flex items-center space-x-3" },
+                                        React.createElement('span', { className: "text-2xl" }, cal.emoji),
+                                        React.createElement('div', null,
+                                            React.createElement('p', { className: "font-medium text-gray-800" }, cal.name),
+                                            React.createElement('p', { className: "text-sm text-gray-600" }, cal.status)
+                                        )
+                                    ),
+                                    React.createElement('div', { 
+                                        className: `w-6 h-6 rounded-full ${isCompleted ? 'bg-green-500' : 'bg-gray-300'}`
+                                    },
+                                        isCompleted && React.createElement(CheckCircle2, { className: "w-4 h-4 text-white m-1" })
+                                    )
+                                );
+                            })
+                        )
+                    )
+                );
+            }
+
+            return React.createElement('div', { className: "min-h-screen bg-gradient-to-br from-purple-100 to-blue-100" },
+                // Header fixo
+                React.createElement('div', { className: "sticky top-0 z-10 bg-white shadow-lg" },
+                    React.createElement('div', { className: "p-4" },
+                        React.createElement('div', { className: "flex items-center justify-between mb-3" },
+                            React.createElement('div', null,
+                                React.createElement('h1', { className: "text-2xl font-bold text-gray-800" }, "🎯 8 Calendários"),
+                                React.createElement('p', { className: "text-sm text-gray-600" }, "Outubro 2024")
+                            ),
+                            React.createElement('button', { 
+                                onClick: () => setShowStats(true),
+                                className: "bg-purple-500 text-white px-4 py-2 rounded-lg font-medium text-sm"
+                            }, "Stats")
+                        ),
+                        
+                        // Progress bar
+                        React.createElement('div', { className: "mb-3" },
+                            React.createElement('div', { className: "flex justify-between items-center mb-1" },
+                                React.createElement('span', { className: "text-xs font-medium text-gray-700" }, `${progress.completed}/${progress.total} tarefas`),
+                                React.createElement('span', { className: "text-xs font-bold text-purple-600" }, `${progress.percentage}%`)
+                            ),
+                            React.createElement('div', { className: "w-full bg-gray-200 rounded-full h-2" },
+                                React.createElement('div', { 
+                                    className: "bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-500",
+                                    style: {width: `${progress.percentage}%`}
+                                })
+                            )
+                        ),
+
+                        // Navegação de dias
+                        React.createElement('div', { className: "flex items-center justify-between" },
+                            React.createElement('button', { 
+                                onClick: () => setCurrentDay(Math.max(0, currentDay - 1)),
+                                disabled: currentDay === 0,
+                                className: "p-2 rounded-lg bg-gray-100 disabled:opacity-50"
+                            }, React.createElement(ChevronLeft, { className: "w-5 h-5" })),
+                            
+                            React.createElement('div', { className: "flex space-x-2" },
+                                days.map((day, index) =>
+                                    React.createElement('button', {
+                                        key: index,
+                                        onClick: () => setCurrentDay(index),
+                                        className: `px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                            currentDay === index 
+                                                ? 'bg-purple-500 text-white' 
+                                                : 'bg-gray-100 text-gray-600'
+                                        }`
+                                    }, day.day)
+                                )
+                            ),
+                            
+                            React.createElement('button', { 
+                                onClick: () => setCurrentDay(Math.min(days.length - 1, currentDay + 1)),
+                                disabled: currentDay === days.length - 1,
+                                className: "p-2 rounded-lg bg-gray-100 disabled:opacity-50"
+                            }, React.createElement(ChevronRight, { className: "w-5 h-5" }))
+                        )
+                    )
+                ),
+
+                // Conteúdo principal
+                React.createElement('div', { className: "p-4" },
+                    // Header do dia
+                    React.createElement('div', { className: `bg-gradient-to-r ${currentDayData.color} text-white p-6 rounded-2xl mb-6 shadow-lg` },
+                        React.createElement('div', { className: "text-center" },
+                            React.createElement('div', { className: "text-4xl mb-2" }, currentDayData.emoji),
+                            React.createElement('h2', { className: "text-2xl font-bold" }, currentDayData.date),
+                            React.createElement('p', { className: "text-lg opacity-90" }, currentDayData.theme)
+                        )
+                    ),
+
+                    // Calendários do dia
+                    (currentDay < 4) && React.createElement('div', { className: "bg-white rounded-2xl p-4 mb-6 shadow-lg" },
+                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-3 flex items-center" },
+                            React.createElement(Star, { className: "w-5 h-5 mr-2 text-orange-500" }),
+                            "Calendários do Dia"
+                        ),
+                        React.createElement('div', { className: "grid grid-cols-2 gap-3" },
+                            calendars.filter(cal => cal.status === currentDayData.day.toLowerCase()).map((cal, index) =>
+                                React.createElement('div', { 
+                                    key: index, 
+                                    className: "bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-lg border border-blue-200"
+                                },
+                                    React.createElement('div', { className: "text-center" },
+                                        React.createElement('div', { className: "text-2xl mb-1" }, cal.emoji),
+                                        React.createElement('p', { className: "text-sm font-medium text-gray-800" }, cal.name)
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Tarefas da manhã
+                    React.createElement('div', { className: "bg-white rounded-2xl p-4 mb-4 shadow-lg" },
+                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-4 flex items-center" },
+                            React.createElement(Zap, { className: "w-5 h-5 mr-2 text-yellow-500" }),
+                            "Manhã (Peak Performance)"
+                        ),
+                        morningTasks.map(task => 
+                            React.createElement(TaskItem, { 
+                                key: task.id, 
+                                ...task, 
+                                isCompleted: completedTasks.has(task.id)
+                            })
+                        )
+                    ),
+
+                    // Tarefas da tarde
+                    afternoonTasks.length > 0 && React.createElement('div', { className: "bg-white rounded-2xl p-4 mb-4 shadow-lg" },
+                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-4 flex items-center" },
+                            React.createElement(Target, { className: "w-5 h-5 mr-2 text-orange-500" }),
+                            "Tarde (Execução)"
+                        ),
+                        afternoonTasks.map(task => 
+                            React.createElement(TaskItem, { 
+                                key: task.id, 
+                                ...task, 
+                                isCompleted: completedTasks.has(task.id)
+                            })
+                        )
+                    ),
+
+                    // Tarefas da noite
+                    eveningTasks.length > 0 && React.createElement('div', { className: "bg-white rounded-2xl p-4 mb-4 shadow-lg" },
+                        React.createElement('h3', { className: "text-lg font-bold text-gray-800 mb-4 flex items-center" },
+                            React.createElement(Heart, { className: "w-5 h-5 mr-2 text-pink-500" }),
+                            "Noite (Qualidade)"
+                        ),
+                        eveningTasks.map(task => 
+                            React.createElement(TaskItem, { 
+                                key: task.id, 
+                                ...task, 
+                                isCompleted: completedTasks.has(task.id)
+                            })
+                        )
+                    ),
+
+                    // Motivação do dia
+                    React.createElement('div', { className: "bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-2xl border border-green-200" },
+                        React.createElement('div', { className: "text-center" },
+                            React.createElement('h4', { className: "font-bold text-gray-800 mb-2" }, "💪 Mantra do Dia"),
+                            React.createElement('p', { className: "text-sm text-gray-700" },
+                                currentDay === 0 ? "Academia 6h → Deep Work 8h → Vitória garantida!" :
+                                currentDay === 1 ? "2 calendários prontos = 25% da missão cumprida!" :
+                                currentDay === 2 ? "Metade da semana, metade dos calendários! 🔥" :
+                                currentDay === 3 ? "Últimos 2 calendários - você está QUASE LÁ!" :
+                                "HOJE É O DIA! 8 calendários = MISSÃO CUMPRIDA! 🏆"
+                            )
+                        )
+                    ),
+
+                    // Espaço extra para scroll
+                    React.createElement('div', { className: "h-16" })
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(MobileCalendarApp), document.getElementById('root'));
+    </script>
+</body>
+</html>
